@@ -13,7 +13,6 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://bengineerz.github.io',
-  base: '/academic-website',
   output: 'static',
   integrations: [mdx({ remarkPlugins:[remarkMath], rehypePlugins:[rehypeKatex] }), react(), sitemap()],
   devToolbar: {

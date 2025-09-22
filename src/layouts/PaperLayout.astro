@@ -1,0 +1,38 @@
+---
+import { siteConfig } from '../config.js';
+const { frontmatter } = Astro.props;
+import AcademicBaseLayout from './AcademicBaseLayout.astro';
+---
+<AcademicBaseLayout title={`${frontmatter.title} | ${siteConfig.author.name}`}>
+  <article>
+    <h1>{frontmatter.title}</h1>
+    {frontmatter.authors && (
+      <p style="color:var(--muted)">
+        {frontmatter.authors.join(', ')}
+      </p>
+    )}
+    {frontmatter.venue && frontmatter.year && (
+      <p style="color:var(--muted)">
+        {frontmatter.venue}, {frontmatter.year}
+      </p>
+    )}
+    {frontmatter.tldr && (
+      <div style="background: var(--accent-light); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+        <strong>TL;DR:</strong> {frontmatter.tldr}
+      </div>
+    )}
+    <slot />
+    
+    {(frontmatter.arxivUrl || frontmatter.codeUrl || frontmatter.blogUrl || frontmatter.talkUrl) && (
+      <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+        <h3>Links</h3>
+        <ul>
+          {frontmatter.arxivUrl && <li><a href={frontmatter.arxivUrl}>arXiv</a></li>}
+          {frontmatter.codeUrl && <li><a href={frontmatter.codeUrl}>Code</a></li>}
+          {frontmatter.blogUrl && <li><a href={frontmatter.blogUrl}>Blog Post</a></li>}
+          {frontmatter.talkUrl && <li><a href={frontmatter.talkUrl}>Talk</a></li>}
+        </ul>
+      </div>
+    )}
+  </article>
+</AcademicBaseLayout>
