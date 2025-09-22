@@ -1,0 +1,73 @@
+---
+import { siteConfig } from '../config.js';
+import AcademicBaseLayout from '../layouts/AcademicBaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const talks = await getCollection('talks');
+---
+
+<AcademicBaseLayout title={`Talks | ${siteConfig.author.name}`}>
+  <h1>Talks</h1>
+  
+  {talks.length > 0 ? (
+    <ul class="talks-list">
+      {talks.map(talk => (
+        <li class="talk-item">
+          <h2 class="talk-title">
+            {talk.data.title}
+            {talk.data.slides && (
+              <a href={talk.data.slides} target="_blank" rel="noopener noreferrer" class="slides-link">
+                [Slides]
+              </a>
+            )}
+          </h2>
+          <div class="talk-meta">
+            {talk.data.event && <span class="event">{talk.data.event}</span>}
+            {talk.data.date && <span class="date">{talk.data.date.toDateString()}</span>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No talks available yet.</p>
+  )}
+</AcademicBaseLayout>
+
+<style>
+  .talks-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .talk-item {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 0;
+  }
+  
+  .talk-item:last-child {
+    border-bottom: none;
+  }
+  
+  .talk-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+  }
+  
+  .slides-link {
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+  }
+  
+  .talk-meta {
+    font-size: 1rem;
+    color: var(--muted);
+  }
+  
+  .event {
+    margin-right: 0.5rem;
+  }
+  
+  .event::after {
+    content: ',';
+  }
+</style>

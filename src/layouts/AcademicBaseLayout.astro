@@ -1,0 +1,162 @@
+---
+import { siteConfig } from '../config.js';
+const { 
+  title = 'Academic Page',
+  // Use props if provided, otherwise use siteConfig values
+  name = siteConfig.author.name, 
+  role = siteConfig.author.role, 
+  imageUrl = siteConfig.author.imageUrl,
+  scholarUrl = siteConfig.author.scholarUrl,
+  showScholar = siteConfig.socialLinks.showScholar,
+  linkedinUrl = siteConfig.socialLinks.linkedinUrl,
+  githubUrl = siteConfig.socialLinks.githubUrl,
+  location = siteConfig.socialLinks.location
+} = Astro.props;
+import ProfileSidebar from '../components/ProfileSidebar.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/theme.css';
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=1" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Debug scripts removed -->
+    
+    <!-- Inline script to handle theme -->
+    <script is:inline>
+      // Apply theme immediately
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      } else if (savedTheme === 'dark') {
+        document.documentElement.classList.remove('light-theme');
+      } else if (prefersDark) {
+        document.documentElement.classList.remove('light-theme');
+      }
+      
+      // Setup theme toggle when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (!themeToggle) return;
+        
+        themeToggle.addEventListener('click', () => {
+          document.documentElement.classList.toggle('light-theme');
+          
+          // Save preference to local storage
+          if (document.documentElement.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+          } else {
+            localStorage.setItem('theme', 'dark');
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="academic-layout">
+      <ProfileSidebar 
+        name={name} 
+        role={role} 
+        imageUrl={imageUrl}
+        scholarUrl={scholarUrl}
+        showScholar={showScholar}
+        linkedinUrl={linkedinUrl}
+        githubUrl={githubUrl}
+        location={location}
+      />
+      
+      <div class="content-wrapper">
+        <TopNav />
+        <main class="main-content">
+          <div class="content-container">
+            <slot />
+          </div>
+        </main>
+        <Footer name={name} />
+      </div>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  /* Reset and base styles */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow-y: auto; /* Critical for scrolling */
+  }
+  
+  /* Layout structure */
+  .academic-layout {
+    display: flex;
+    min-height: 100%;
+    position: relative;
+  }
+  
+  .content-wrapper {
+    width: calc(100% - 280px);
+    margin-left: 280px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 1rem 2rem 4rem;
+    /* No overflow restriction here */
+  }
+  
+  .content-container {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  /* Mobile styles */
+  @media (max-width: 768px) {
+    .academic-layout {
+      flex-direction: column;
+    }
+    
+    .content-wrapper {
+      width: 100%;
+      margin-left: 0;
+      min-height: unset;
+    }
+    
+    .main-content {
+      padding: 1rem;
+    }
+  }
+  
+  /* Animation for smooth transitions */
+  @media (min-width: 769px) {
+    .content-wrapper {
+      transition: width 0.3s, margin-left 0.3s;
+    }
+  }
+</style>

@@ -1,0 +1,89 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<header class="top-header">
+  <nav class="top-nav">
+    <a href="/" class="nav-item">Home</a>
+    <a href="/papers/" class="nav-item">Publications</a>
+    <a href="/blog/" class="nav-item">Blog</a>
+    <a href="/talks/" class="nav-item">Talks</a>
+    <div class="theme-toggle-wrapper">
+      <ThemeToggle />
+    </div>
+  </nav>
+</header>
+
+<style>
+  .top-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 2rem;
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+    box-sizing: border-box;
+    height: 60px; /* Fixed height for consistent alignment */
+    align-items: center;
+  }
+
+  .top-nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    height: 100%;
+  }
+
+  .nav-item {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 0.25rem;
+  }
+
+  .nav-item:hover {
+    color: var(--link);
+  }
+
+  .nav-item:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; /* Adjusted to be closer to the text */
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--link);
+  }
+
+  .theme-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    margin-left: 0.75rem;
+    height: 100%;
+    padding: 0 0.25rem;
+    margin-top: 1px; /* Fine-tuning vertical alignment */
+  }
+  
+  @media (max-width: 768px) {
+    .top-header {
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      height: 50px; /* Slightly smaller height on mobile */
+    }
+    
+    .theme-toggle-wrapper {
+      margin-left: 0.5rem;
+    }
+    
+    .nav-item {
+      padding: 0 0.15rem;
+    }
+  }
+</style>

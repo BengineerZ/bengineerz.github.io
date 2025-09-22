@@ -1,0 +1,274 @@
+---
+import { siteConfig } from '../config.js';
+import Icon from './Icon.astro';
+// You can customize these properties as needed
+const { 
+  name = "Your Name", 
+  role = "PhD Student", 
+  imageUrl = "/profile-placeholder.jpg",
+  scholarUrl = siteConfig.author.scholarUrl,
+  showScholar = siteConfig.socialLinks.showScholar,
+  linkedinUrl = siteConfig.socialLinks.linkedinUrl,
+  githubUrl = siteConfig.socialLinks.githubUrl,
+  location = siteConfig.socialLinks.location
+} = Astro.props;
+---
+
+<aside class="profile-sidebar">
+  <div class="profile-container">
+    <div class="profile-image-container">
+      <div 
+        class="profile-image"
+        style={`background-image: url('${imageUrl}')`}
+        data-original-bg={imageUrl}
+        data-hover-bg="/profile-fun.gif"
+        role="img"
+        aria-label={`Photo of ${name}`}
+      ></div>
+    </div>
+    <div class="profile-text">
+      <h1 class="profile-name">{name}</h1>
+      <p class="profile-role">{role}</p>
+    </div>
+    
+    <ul class="profile-links">
+      {/* Google Scholar - visible on all screens */}
+      {showScholar && (
+        <li class="link-item">
+          <a href={scholarUrl} target="_blank" rel="noopener noreferrer" class="profile-link">
+            <Icon name="googlescholar" size="1.2em" /> Google Scholar
+          </a>
+        </li>
+      )}
+      
+      {/* Desktop-only links */}
+      {linkedinUrl && (
+        <li class="link-item desktop-only">
+          <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" class="profile-link">
+            <Icon name="linkedin" size="1.2em" /> LinkedIn
+          </a>
+        </li>
+      )}
+      
+      {githubUrl && (
+        <li class="link-item desktop-only">
+          <a href={githubUrl} target="_blank" rel="noopener noreferrer" class="profile-link">
+            <Icon name="github" size="1.2em" /> GitHub
+          </a>
+        </li>
+      )}
+      
+      {location && (
+        <li class="link-item desktop-only">
+          <div class="profile-link location-link">
+            <Icon name="location" size="1.2em" /> {location}
+          </div>
+        </li>
+      )}
+    </ul>
+  </div>
+</aside>
+
+<style>
+  .profile-sidebar {
+    width: 280px;
+    background: var(--bg);
+    color: var(--text);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    border-right: 1px solid var(--border);
+    overflow-y: auto; /* Allow scrolling within sidebar if content is too tall */
+  }
+  
+  .profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Profile header removed */
+
+  .profile-image-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 0.8rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .profile-image-container:hover {
+    transform: scale(1.05);
+  }
+
+  .profile-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: all 0.3s ease;
+  }
+
+  .profile-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.4rem 0;
+    text-align: center;
+  }
+
+  .profile-role {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 0.8rem;
+    text-align: center;
+  }
+
+  .profile-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Add a subtle separator for the first desktop-only item */
+  .desktop-only:first-of-type {
+    position: relative;
+    padding-top: 0.3rem;
+    margin-top: 0.3rem;
+  }
+  
+  .desktop-only:first-of-type::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 1px;
+    background-color: var(--border);
+    opacity: 0.5;
+  }
+
+  .link-item {
+    margin-bottom: 0.4rem; /* Reduced spacing between items */
+  }
+
+  .link-item:last-child {
+    margin-bottom: 0; /* No margin on last item */
+  }
+
+  .profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--link);
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 0.15rem 0.5rem; /* Reduced vertical padding */
+  }
+
+  .profile-link:hover {
+    color: var(--link-hover);
+  }
+  
+  .location-link {
+    color: var(--text-muted);
+    cursor: default;
+  }
+
+  @media (max-width: 768px) {
+    .profile-sidebar {
+      position: relative;
+      width: 100%;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .profile-container {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .profile-image-container {
+      width: 70px;
+      height: 70px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+    
+    .profile-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    
+    .profile-name {
+      font-size: 1.2rem;
+      margin: 0 0 0.2rem;
+      text-align: left;
+    }
+    
+    .profile-role {
+      font-size: 0.9rem;
+      margin: 0;
+      text-align: left;
+    }
+    
+    .profile-links {
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    
+    .desktop-only {
+      display: none; /* Hide desktop-only links on mobile */
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const profileImage = document.querySelector('.profile-image');
+    if (profileImage) {
+      const originalBg = profileImage.getAttribute('data-original-bg');
+      const hoverBg = profileImage.getAttribute('data-hover-bg');
+      
+      if (hoverBg) {
+        // Preload the hover image/gif to prevent flickering
+        const img = new Image();
+        img.src = hoverBg;
+        
+        profileImage.addEventListener('mouseenter', () => {
+          // For GIFs, we add a timestamp to force reload and restart animation
+          const timestamp = new Date().getTime();
+          profileImage.style.backgroundImage = `url('${hoverBg}?t=${timestamp}')`;
+        });
+        
+        profileImage.addEventListener('mouseleave', () => {
+          profileImage.style.backgroundImage = `url('${originalBg}')`;
+        });
+      }
+    }
+  });
+</script>

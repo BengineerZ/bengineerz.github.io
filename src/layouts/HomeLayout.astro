@@ -1,0 +1,25 @@
+---
+import { siteConfig } from '../config.js';
+const { 
+  title = `${siteConfig.author.name} - Academic Homepage`,
+  name = siteConfig.author.name,
+  role = siteConfig.author.role,
+  imageUrl = siteConfig.author.imageUrl,
+  scholarUrl = siteConfig.author.scholarUrl,
+  showScholar = siteConfig.socialLinks.showScholar
+} = Astro.props;
+import AcademicBaseLayout from './AcademicBaseLayout.astro';
+---
+
+<AcademicBaseLayout 
+  title={title} 
+  name={name}
+  role={role}
+  imageUrl={imageUrl}
+  scholarUrl={scholarUrl}
+  showScholar={showScholar}
+>
+  <slot />
+</AcademicBaseLayout>
+
+<!-- Home layout uses styles from AcademicBaseLayout -->

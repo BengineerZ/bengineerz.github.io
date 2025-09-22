@@ -1,0 +1,7 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#2c3e50"/>
+  <text x="200" y="180" font-family="Arial" font-size="28" text-anchor="middle" fill="#ecf0f1">Embodied Reasoning</text>
+  <text x="200" y="220" font-family="Arial" font-size="20" text-anchor="middle" fill="#ecf0f1">Research Paper</text>
+  <circle cx="200" cy="120" r="50" fill="#3498db"/>
+  <path d="M170 120 L230 120 M200 90 L200 150" stroke="#ecf0f1" stroke-width="8"/>
+</svg>

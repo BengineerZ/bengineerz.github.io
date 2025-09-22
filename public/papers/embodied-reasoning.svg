@@ -1,0 +1,13 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#3f51b5"/>
+  <circle cx="100" cy="230" r="30" fill="white"/>
+  <rect x="50" y="250" width="100" height="100" fill="white"/>
+  <circle cx="90" cy="225" r="5" fill="#3f51b5"/>
+  <circle cx="110" cy="225" r="5" fill="#3f51b5"/>
+  <circle cx="300" cy="100" r="60" fill="white"/>
+  <path d="M120,220 C150,180 200,150 250,120" stroke="white" stroke-width="5" fill="none"/>
+  <path d="M270,80 C280,70 310,90 320,80" stroke="#3f51b5" stroke-width="2" fill="none"/>
+  <path d="M280,110 C290,100 320,120 330,110" stroke="#3f51b5" stroke-width="2" fill="none"/>
+  <path d="M270,130 C280,120 310,140 320,130" stroke="#3f51b5" stroke-width="2" fill="none"/>
+  <text x="200" y="350" font-family="Arial" font-size="24" font-weight="bold" fill="white" text-anchor="middle">Embodied Reasoning</text>
+</svg>

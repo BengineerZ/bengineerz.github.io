@@ -1,0 +1,456 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from './Icon.astro';
+
+// Helper function to check if a file is a video
+function isVideoFile(filename) {
+  if (!filename) return false;
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+  return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+}
+
+// Helper function to check if a paper has meaningful content
+function hasMeaningfulContent(paper) {
+  try {
+    // Check the raw markdown body content
+    if (!paper.body) {
+      return false;
+    }
+    
+    // Get the raw content and clean it up
+    const content = paper.body.trim().toLowerCase();
+    
+    // Consider content meaningful if it's more than just "n/a" or similar minimal placeholders
+    const minimalPlaceholders = ['n/a', 'na', 'tbd', 'todo', 'coming soon', ''];
+    
+    // Check if content is substantial (more than 20 characters) and not a minimal placeholder
+    return content.length > 20 && !minimalPlaceholders.includes(content);
+  } catch (error) {
+    // If there's any error, just return false (don't show details link)
+    return false;
+  }
+}
+
+// Get papers from collection and sort by date (descending)
+const allPapers = await getCollection('papers');
+
+const sortedPapers = allPapers
+  .filter(paper => !paper.data.draft) // Filter out draft papers
+  .sort((a, b) => {
+    // Use date if available, otherwise fall back to year
+    const dateA = a.data.date ? new Date(a.data.date) : new Date(a.data.year || 0, 0, 1);
+    const dateB = b.data.date ? new Date(b.data.date) : new Date(b.data.year || 0, 0, 1);
+    return dateB.getTime() - dateA.getTime();
+  })
+  .slice(0, 3); // Show only the 3 most recent papers
+
+// Check which papers have meaningful content
+const papers = sortedPapers.map((paper) => {
+  const hasContent = hasMeaningfulContent(paper);
+  return {
+    ...paper,
+    hasMeaningfulContent: hasContent
+  };
+});
+
+// Props
+const { showAll = false } = Astro.props;
+---
+
+<section class="publications">
+  <h2>Recent Research</h2>
+  
+  {papers.length > 0 ? (
+    <ul class="publication-list">
+      {papers.map(paper => (
+        <li class="publication-item">
+          <div class="publication-container">
+            <div class="publication-image">
+              {paper.data.image ? (
+                isVideoFile(paper.data.image) ? (
+                  <video 
+                    data-src={paper.data.image} 
+                    alt={`Video for ${paper.data.title}`}
+                    style="border-radius: 8px; width: 100%; height: 100%; object-fit: cover; background-color: #f0f0f0;"
+                    class="lazy-video"
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                  />
+                ) : (
+                  <img 
+                    data-src={paper.data.image} 
+                    alt={`Image for ${paper.data.title}`}
+                    style="border-radius: 8px; width: 100%; height: 100%; object-fit: cover; background-color: #f0f0f0;" 
+                    class="lazy-image"
+                    loading="lazy"
+                  />
+                )
+              ) : (
+                <div class="image-placeholder"></div>
+              )}
+            </div>
+            
+            <div class="publication-content">
+              <h3 class="publication-title">
+                {paper.data.url ? (
+                  <a href={paper.data.url} target="_blank" rel="noopener noreferrer">
+                    {paper.data.title}
+                  </a>
+                ) : (
+                  paper.data.title
+                )}
+              </h3>
+              
+              {paper.data.authors && (
+                <div class="publication-authors" set:html={paper.data.authors.join(', ')}>
+                </div>
+              )}
+              
+              <div class="publication-meta">
+                {paper.data.venue && <span class="venue">{paper.data.venue}</span>}
+                {(paper.data.date || paper.data.year) && (
+                  <span class="year">
+                    {paper.data.date ? new Date(paper.data.date).getFullYear() : paper.data.year}
+                  </span>
+                )}
+              </div>
+              
+              <div class="publication-links">
+                {paper.data.arxivUrl && (
+                  <a href={paper.data.arxivUrl} class="paper-link">
+                    <Icon name="search" size="0.9em" /> arXiv
+                  </a>
+                )}
+                {paper.data.blogUrl && (
+                  <a href={paper.data.blogUrl} class="paper-link">
+                    <Icon name="pencil" size="0.9em" /> Blog
+                  </a>
+                )}
+                {paper.data.codeUrl && (
+                  <a href={paper.data.codeUrl} class="paper-link">
+                    <Icon name="github" size="0.9em" /> Code
+                  </a>
+                )}
+                <!-- {paper.hasMeaningfulContent && (
+                  <a href={`/papers/${paper.slug}/`} class="paper-link">
+                    <Icon name="pencil" size="0.9em" /> Details
+                  </a>
+                )} -->
+              </div>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No publications available yet.</p>
+  )}
+  
+  <a href="/papers/" class="all-papers-link">
+    <Icon name="search" size="0.9em" /> View all Research →
+  </a>
+</section>
+
+<style>
+  .publications {
+    margin: 2rem 0;
+  }
+  
+  .publication-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .publication-item {
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+  }
+  
+  .publication-item:last-child {
+    border-bottom: none;
+  }
+  
+  .publication-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+.publication-image {
+    flex: 0 0 120px; /* Fixed width to ensure square aspect ratio */
+    height: 120px; /* Fixed height equal to width for perfect square */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px; /* Rounded corners */
+    background-color: var(--bg); /* Use theme background color */
+    border: 1px solid var(--border); /* Add a subtle border */
+    position: relative; /* For absolute positioning of children if needed */
+}
+  
+  .publication-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Makes sure image fills the square container */
+    border-radius: 8px; /* Rounded corners */
+    display: block; /* Ensures proper rendering */
+  }
+  
+  .publication-image video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Makes sure video fills the square container */
+    border-radius: 8px; /* Rounded corners */
+    display: block; /* Ensures proper rendering */
+  }
+  
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    display: block; /* Ensures proper rendering */
+  }
+
+  section h2 {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .publication-content {
+    flex: 1;
+  }
+  
+  .publication-title {
+    margin: 0 0 0.3rem;
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+  
+  .publication-authors {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .publication-authors strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  
+  .publication-meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  
+  .venue {
+    margin-right: 0.5rem;
+  }
+  
+  .venue::after {
+    content: ',';
+  }
+  
+  .publication-links {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+  }
+  
+  .paper-link {
+    color: var(--link); /* Use the theme's link color variable */
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  
+  .paper-link:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+  }
+  
+  .all-papers-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 1rem;
+    font-weight: 500;
+  }
+  
+  /* Lazy loading styles */
+  .lazy-image {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  
+  .lazy-video {
+    opacity: 1; /* Videos are visible by default */
+    transition: opacity 0.4s ease;
+  }
+  
+  .lazy-image.loaded, .lazy-video.loaded {
+    opacity: 1;
+  }
+  
+  /* Video loading states */
+  .lazy-video.loading {
+    opacity: 0.8;
+    position: relative;
+    filter: brightness(0.7);
+  }
+  
+  .lazy-video.loading::after {
+    content: "⏳ Loading video...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    font-size: 0.8rem;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 6px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .lazy-video.error {
+    opacity: 0.6;
+    position: relative;
+  }
+  
+  .lazy-video.error::after {
+    content: "❌ Video failed to load";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #d32f2f;
+    font-size: 0.8rem;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 6px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Optimized lazy loading for images and videos
+    const lazyImages = document.querySelectorAll('.lazy-image');
+    const lazyVideos = document.querySelectorAll('.lazy-video');
+    
+    if ('IntersectionObserver' in window) {
+      
+      // Image lazy loading (smaller margin, standard approach)
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            const src = img.getAttribute('data-src');
+            
+            if (src) {
+              img.src = src;
+              img.classList.add('loaded');
+              img.removeAttribute('data-src');
+              observer.unobserve(img);
+            }
+          }
+        });
+      }, {
+        rootMargin: '50px 0px',
+        threshold: 0.1
+      });
+      
+      // Video lazy loading (larger margin for preloading, more sophisticated handling)
+      const videoObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const video = entry.target;
+            const src = video.getAttribute('data-src');
+            
+            if (src) {
+              // Set loading state
+              video.classList.add('loading');
+              
+              // Load the video
+              video.src = src;
+              
+              // Handle video events
+              const onLoadedMetadata = () => {
+                video.classList.remove('loading');
+                video.classList.add('loaded');
+                
+                // Attempt autoplay after a short delay to ensure video is ready
+                setTimeout(() => {
+                  const playPromise = video.play();
+                  if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                      console.log('Video autoplay started successfully');
+                    }).catch(error => {
+                      console.log('Video autoplay prevented:', error.message);
+                      // Add click-to-play functionality
+                      video.setAttribute('controls', '');
+                      video.style.cursor = 'pointer';
+                    });
+                  }
+                }, 100);
+                
+                video.removeEventListener('loadedmetadata', onLoadedMetadata);
+              };
+              
+              const onError = () => {
+                video.classList.remove('loading');
+                video.classList.add('error');
+                console.error('Video failed to load:', src);
+                video.removeEventListener('error', onError);
+              };
+              
+              video.addEventListener('loadedmetadata', onLoadedMetadata);
+              video.addEventListener('error', onError);
+              
+              video.removeAttribute('data-src');
+              observer.unobserve(video);
+            }
+          }
+        });
+      }, {
+        rootMargin: '100px 0px', // Larger margin for videos (start loading earlier)
+        threshold: 0.05 // Lower threshold to trigger sooner
+      });
+      
+      // Observe elements
+      lazyImages.forEach(img => imageObserver.observe(img));
+      lazyVideos.forEach(video => videoObserver.observe(video));
+      
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      [...lazyImages, ...lazyVideos].forEach(element => {
+        const src = element.getAttribute('data-src');
+        if (src) {
+          element.src = src;
+          element.classList.add('loaded');
+          element.removeAttribute('data-src');
+          
+          if (element.tagName === 'VIDEO') {
+            // Wait for metadata to load before attempting to play
+            element.addEventListener('loadedmetadata', () => {
+              element.play().catch(() => {
+                element.setAttribute('controls', '');
+              });
+            });
+          }
+        }
+      });
+    }
+  });
+</script>

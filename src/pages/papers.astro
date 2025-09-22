@@ -1,0 +1,490 @@
+---
+import { siteConfig } from '../config.js';
+import AcademicBaseLayout from '../layouts/AcademicBaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Icon from '../components/Icon.astro';
+
+// Helper function to check if a file is a video
+function isVideoFile(filename) {
+  if (!filename) return false;
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+  return videoExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+}
+
+let papers = [];
+let errorMessage = "";
+
+try {
+  // Get papers and sort by date (descending)
+  const allPapers = await getCollection('papers');
+  console.log('Papers found:', allPapers.length);
+  console.log('Paper data:', JSON.stringify(allPapers.map(p => p.data.title)));
+  
+  papers = allPapers
+    .filter(paper => !paper.data.draft) // Filter out draft papers
+    .sort((a, b) => {
+      // Use date if available, otherwise fall back to year
+      const dateA = a.data.date ? new Date(a.data.date) : new Date(a.data.year || 0, 0, 1);
+      const dateB = b.data.date ? new Date(b.data.date) : new Date(b.data.year || 0, 0, 1);
+      return dateB.getTime() - dateA.getTime();
+    });
+} catch (error) {
+  console.error('Error loading papers:', error);
+  errorMessage = error.toString();
+}
+---
+
+<AcademicBaseLayout title={`Papers | ${siteConfig.author.name}`}>
+  <h1>Research</h1>
+  
+  {errorMessage && <p class="error">Error: {errorMessage}</p>}
+  
+  {papers.length > 0 ? (
+    <ul class="papers-list">
+      {papers.map(paper => (
+        <li class="paper-item">
+          <div class="paper-container">
+            <div class="paper-image-container">
+              {paper.data.image ? (
+                isVideoFile(paper.data.image) ? (
+                  <video 
+                    data-src={paper.data.image} 
+                    alt={`Video for ${paper.data.title}`} 
+                    class="paper-image lazy-video"
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                    style="background-color: #f0f0f0;"
+                  />
+                ) : (
+                  <img 
+                    data-src={paper.data.image} 
+                    alt={`Image for ${paper.data.title}`} 
+                    class="paper-image lazy-image" 
+                    loading="lazy"
+                    style="background-color: #f0f0f0;"
+                  />
+                )
+              ) : (
+                <div class="paper-image-placeholder"></div>
+              )}
+            </div>
+            
+            <div class="paper-content">
+              <h2 class="paper-title">
+                {paper.data.url ? (
+                  <a href={paper.data.url} target="_blank" rel="noopener noreferrer">
+                    {paper.data.title}
+                  </a>
+                ) : (
+                  paper.data.title
+                )}
+              </h2>
+              
+              <div class="paper-authors" set:html={paper.data.authors ? paper.data.authors.join(', ') : 'Anonymous'}>
+              </div>
+              
+              <div class="paper-meta">
+                {paper.data.venue && <span class="venue">{paper.data.venue}</span>}
+                {(paper.data.date || paper.data.year) && (
+                  <span class="year">
+                    {paper.data.date ? new Date(paper.data.date).getFullYear() : paper.data.year}
+                  </span>
+                )}
+              </div>
+              
+              {paper.data.tldr && (
+                <div class="paper-tldr">
+                  <strong>TL;DR:</strong> {paper.data.tldr}
+                </div>
+              )}
+              
+              <div class="paper-links">
+                {paper.data.arxivUrl && (
+                  <a href={paper.data.arxivUrl} target="_blank" rel="noopener noreferrer" class="paper-link arxiv-link">
+                    <Icon name="search" size="1em" /> arXiv
+                  </a>
+                )}
+                
+                {paper.data.blogUrl && (
+                  <a href={paper.data.blogUrl} class="paper-link blog-link">
+                    <Icon name="pencil" size="1em" /> Blog
+                  </a>
+                )}
+                
+                {paper.data.talkUrl && (
+                  <a href={paper.data.talkUrl} class="paper-link talk-link">
+                    <Icon name="talk" size="1em" /> Talk
+                  </a>
+                )}
+                
+                {paper.data.codeUrl && (
+                  <a href={paper.data.codeUrl} target="_blank" rel="noopener noreferrer" class="paper-link code-link">
+                    <Icon name="github" size="1em" /> Code
+                  </a>
+                )}
+                
+                {paper.data.projectUrl && (
+                  <a href={paper.data.projectUrl} target="_blank" rel="noopener noreferrer" class="paper-link project-link">
+                    <Icon name="website" size="1em" /> Project
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p>No papers available yet.</p>
+  )}
+</AcademicBaseLayout>
+
+<style>
+  .papers-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .paper-item {
+    border-bottom: 1px solid var(--border);
+    padding: 1.8rem 0;
+  }
+  
+  .paper-item:last-child {
+    border-bottom: none;
+  }
+  
+  .paper-container {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  
+  .paper-image-container {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .paper-image-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .paper-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #f8f9fa;
+  }
+  
+  .paper-image video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #f8f9fa;
+  }
+  
+  .paper-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+  }
+  
+  .paper-content {
+    flex: 1;
+    min-width: 0; /* Fix for flexbox child text overflow */
+  }
+  
+  .paper-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+  
+  .paper-title a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .paper-title a:hover {
+    color: var(--link);
+  }
+  
+  .paper-authors {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+  
+  .paper-authors strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  
+  .paper-meta {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+  
+  .venue {
+    margin-right: 0.5rem;
+  }
+  
+  .venue::after {
+    content: ',';
+  }
+  
+  .paper-tldr {
+    font-size: 0.95rem;
+    margin: 0.8rem 0;
+    line-height: 1.6;
+    max-width: 700px;
+    color: var(--text-light);
+  }
+  
+  .paper-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+  
+  .paper-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    color: var(--text);
+    background-color: rgba(128, 128, 128, 0.1);
+  }
+  
+  .paper-link:hover {
+    background-color: rgba(128, 128, 128, 0.2);
+  }
+  
+  /* Specific link styles */
+  .arxiv-link {
+    color: #B31B1B;
+  }
+  
+  .blog-link {
+    color: #0066cc;
+  }
+  
+  .code-link {
+    color: #6e5494;
+  }
+  
+  .talk-link {
+    color: #e9710f;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .paper-container {
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    
+    .paper-image-container {
+      width: 100%;
+      max-width: 250px;
+      height: 180px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .paper-links {
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+  }
+  
+  /* Lazy loading styles */
+  .lazy-image {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  
+  .lazy-video {
+    opacity: 1; /* Videos are visible by default */
+    transition: opacity 0.4s ease;
+  }
+  
+  .lazy-image.loaded, .lazy-video.loaded {
+    opacity: 1;
+  }
+  
+  /* Video loading states */
+  .lazy-video.loading {
+    opacity: 0.8;
+    position: relative;
+    filter: brightness(0.7);
+  }
+  
+  .lazy-video.loading::after {
+    content: "⏳ Loading video...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    font-size: 0.9rem;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 16px;
+    border-radius: 6px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .lazy-video.error {
+    opacity: 0.6;
+    position: relative;
+  }
+  
+  .lazy-video.error::after {
+    content: "❌ Video failed to load";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #d32f2f;
+    font-size: 0.9rem;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 16px;
+    border-radius: 6px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Optimized lazy loading for images and videos
+    const lazyImages = document.querySelectorAll('.lazy-image');
+    const lazyVideos = document.querySelectorAll('.lazy-video');
+    
+    if ('IntersectionObserver' in window) {
+      
+      // Image lazy loading (smaller margin, standard approach)
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            const src = img.getAttribute('data-src');
+            
+            if (src) {
+              img.src = src;
+              img.classList.add('loaded');
+              img.removeAttribute('data-src');
+              observer.unobserve(img);
+            }
+          }
+        });
+      }, {
+        rootMargin: '50px 0px',
+        threshold: 0.1
+      });
+      
+      // Video lazy loading (larger margin for preloading, more sophisticated handling)
+      const videoObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const video = entry.target;
+            const src = video.getAttribute('data-src');
+            
+            if (src) {
+              // Set loading state
+              video.classList.add('loading');
+              
+              // Load the video
+              video.src = src;
+              
+              // Handle video events
+              const onLoadedMetadata = () => {
+                video.classList.remove('loading');
+                video.classList.add('loaded');
+                
+                // Attempt autoplay after a short delay to ensure video is ready
+                setTimeout(() => {
+                  const playPromise = video.play();
+                  if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                      console.log('Video autoplay started successfully');
+                    }).catch(error => {
+                      console.log('Video autoplay prevented:', error.message);
+                      // Add click-to-play functionality
+                      video.setAttribute('controls', '');
+                      video.style.cursor = 'pointer';
+                    });
+                  }
+                }, 100);
+                
+                video.removeEventListener('loadedmetadata', onLoadedMetadata);
+              };
+              
+              const onError = () => {
+                video.classList.remove('loading');
+                video.classList.add('error');
+                console.error('Video failed to load:', src);
+                video.removeEventListener('error', onError);
+              };
+              
+              video.addEventListener('loadedmetadata', onLoadedMetadata);
+              video.addEventListener('error', onError);
+              
+              video.removeAttribute('data-src');
+              observer.unobserve(video);
+            }
+          }
+        });
+      }, {
+        rootMargin: '100px 0px', // Larger margin for videos (start loading earlier)
+        threshold: 0.05 // Lower threshold to trigger sooner
+      });
+      
+      // Observe elements
+      lazyImages.forEach(img => imageObserver.observe(img));
+      lazyVideos.forEach(video => videoObserver.observe(video));
+      
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      [...lazyImages, ...lazyVideos].forEach(element => {
+        const src = element.getAttribute('data-src');
+        if (src) {
+          element.src = src;
+          element.classList.add('loaded');
+          element.removeAttribute('data-src');
+          
+          if (element.tagName === 'VIDEO') {
+            // Wait for metadata to load before attempting to play
+            element.addEventListener('loadedmetadata', () => {
+              element.play().catch(() => {
+                element.setAttribute('controls', '');
+              });
+            });
+          }
+        }
+      });
+    }
+  });
+</script>

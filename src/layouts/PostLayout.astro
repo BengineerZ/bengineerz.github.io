@@ -1,0 +1,12 @@
+---
+import { siteConfig } from '../config.js';
+const { frontmatter } = Astro.props;
+import AcademicBaseLayout from './AcademicBaseLayout.astro';
+---
+<AcademicBaseLayout title={`${frontmatter.title} | ${siteConfig.author.name}`}>
+  <article>
+    <h1>{frontmatter.title}</h1>
+    <p style="color:var(--muted)">{frontmatter.pubDate.toDateString()}</p>
+    <slot />
+  </article>
+</AcademicBaseLayout>

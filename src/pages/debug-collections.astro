@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+
+// Try to get all collections to see if any work
+const papers = await getCollection('papers');
+const blogs = await getCollection('blog');
+const talks = await getCollection('talks');
+---
+
+<html>
+<head>
+  <title>Content Collections Test</title>
+</head>
+<body>
+  <h1>Content Collections Debug</h1>
+  
+  <h2>Papers Collection</h2>
+  <p>Found {papers.length} papers</p>
+  <ul>
+    {papers.map(paper => (
+      <li>{paper.data.title} by {paper.data.authors?.join(', ') || 'No authors'}</li>
+    ))}
+  </ul>
+  
+  <h2>Blog Collection</h2>
+  <p>Found {blogs.length} blog posts</p>
+  
+  <h2>Talks Collection</h2>
+  <p>Found {talks.length} talks</p>
+</body>
+</html>

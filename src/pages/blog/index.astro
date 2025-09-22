@@ -1,0 +1,33 @@
+---
+import { siteConfig } from '../../config.js';
+import AcademicBaseLayout from '../../layouts/AcademicBaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a,b) => +b.data.pubDate - +a.data.pubDate);
+
+// Group posts by year
+const byYear = posts.reduce((acc, p) => {
+  const y = new Date(p.data.pubDate).getFullYear();
+  (acc[y] ||= []).push(p);
+  return acc;
+}, {});
+
+// Sort years in descending order
+const years = Object.keys(byYear).sort((a,b) => +b - +a);
+---
+<AcademicBaseLayout title={`Blog | ${siteConfig.author.name}`}>
+  <h1>Blog</h1>
+  {years.map(year => (
+    <div class="year-section">
+      <h2>{year}</h2>
+      <ul>
+        {byYear[year].map(post => (
+          <li>
+            <a href={`/blog/${post.slug}/`}>{post.data.title}</a> — {post.data.pubDate.toDateString()}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</AcademicBaseLayout>

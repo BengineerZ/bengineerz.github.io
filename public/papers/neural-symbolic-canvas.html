@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="neuralSymbolicCanvas" width="400" height="400" style="border:1px solid #d3d3d3;"></canvas>
+<script>
+const canvas = document.getElementById("neuralSymbolicCanvas");
+const ctx = canvas.getContext("2d");
+
+// Background color
+ctx.fillStyle = "#009688";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Draw neural network
+ctx.fillStyle = "#ffffff";
+// Input layer
+for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.arc(100, 100 + i * 70, 20, 0, 2 * Math.PI);
+    ctx.fill();
+}
+// Hidden layer
+for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.arc(200, 80 + i * 60, 20, 0, 2 * Math.PI);
+    ctx.fill();
+}
+// Output layer
+for (let i = 0; i < 2; i++) {
+    ctx.beginPath();
+    ctx.arc(300, 130 + i * 90, 20, 0, 2 * Math.PI);
+    ctx.fill();
+}
+
+// Connections
+ctx.strokeStyle = "#ffffff";
+ctx.lineWidth = 1;
+// Input to hidden
+for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 4; j++) {
+        ctx.beginPath();
+        ctx.moveTo(120, 100 + i * 70);
+        ctx.lineTo(180, 80 + j * 60);
+        ctx.stroke();
+    }
+}
+// Hidden to output
+for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 2; j++) {
+        ctx.beginPath();
+        ctx.moveTo(220, 80 + i * 60);
+        ctx.lineTo(280, 130 + j * 90);
+        ctx.stroke();
+    }
+}
+
+// Symbolic rules
+ctx.fillStyle = "#ffffff";
+ctx.font = "14px Arial";
+ctx.textAlign = "center";
+// Rule 1
+ctx.fillRect(50, 300, 300, 30);
+ctx.fillStyle = "#009688";
+ctx.fillText("IF object_detected THEN avoid", 200, 320);
+// Rule 2
+ctx.fillStyle = "#ffffff";
+ctx.fillRect(50, 340, 300, 30);
+ctx.fillStyle = "#009688";
+ctx.fillText("IF goal_reached THEN stop", 200, 360);
+
+// Text
+ctx.fillStyle = "#ffffff";
+ctx.font = "bold 22px Arial";
+ctx.textAlign = "center";
+ctx.fillText("Neural-Symbolic Integration", 200, 30);
+
+// Save canvas as PNG
+const imgData = canvas.toDataURL("image/png");
+document.write('<a href="' + imgData + '" download="neural-symbolic.png">Download Neural-Symbolic Image</a><br>');
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+---
+const { title = 'My Site', showProfileSidebar = false } = Astro.props;
+import Nav from '../components/Nav.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import '../styles/theme.css';
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
+    <!-- Inline script to handle theme -->
+    <script is:inline>
+      // Apply theme immediately
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      } else if (savedTheme === 'dark') {
+        document.documentElement.classList.remove('light-theme');
+      } else if (prefersDark) {
+        document.documentElement.classList.remove('light-theme');
+      }
+      
+      // Setup theme toggle when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (!themeToggle) return;
+        
+        themeToggle.addEventListener('click', () => {
+          document.documentElement.classList.toggle('light-theme');
+          
+          // Save preference to local storage
+          if (document.documentElement.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+          } else {
+            localStorage.setItem('theme', 'dark');
+          }
+        });
+      });
+    </script>
+  </head>
+  <body class="site">
+    <header class="site__header">
+      <div class="header-left">
+        <ThemeToggle />
+        <a class="site__brand" href="/">My Site</a>
+      </div>
+      <Nav />
+    </header>
+    <main class="site__main">
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  /* Ensure proper scrolling behavior */
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+  
+  body {
+    overflow-y: auto; /* Allow vertical scrolling */
+  }
+  
+  .site {
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+  
+  .site__header {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: var(--pad);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 50;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .site__brand {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  .site__main {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: var(--pad);
+  }
+</style>

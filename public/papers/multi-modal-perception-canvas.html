@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="multiModalCanvas" width="400" height="400" style="border:1px solid #d3d3d3;"></canvas>
+<script>
+const canvas = document.getElementById("multiModalCanvas");
+const ctx = canvas.getContext("2d");
+
+// Background color
+ctx.fillStyle = "#673ab7";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Draw robot with sensors
+ctx.fillStyle = "#ffffff";
+// Robot body
+ctx.beginPath();
+ctx.arc(200, 250, 70, 0, 2 * Math.PI);
+ctx.fill();
+// Robot head
+ctx.beginPath();
+ctx.arc(200, 150, 40, 0, 2 * Math.PI);
+ctx.fill();
+// Connect head and body
+ctx.fillRect(180, 190, 40, 20);
+
+// Robot eyes (camera)
+ctx.fillStyle = "#ff5722";
+ctx.beginPath();
+ctx.arc(180, 140, 10, 0, 2 * Math.PI);
+ctx.fill();
+ctx.beginPath();
+ctx.arc(220, 140, 10, 0, 2 * Math.PI);
+ctx.fill();
+// Visual rays
+ctx.strokeStyle = "#ff5722";
+ctx.lineWidth = 2;
+ctx.setLineDash([5, 5]);
+ctx.beginPath();
+ctx.moveTo(180, 130);
+ctx.lineTo(140, 80);
+ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(220, 130);
+ctx.lineTo(260, 80);
+ctx.stroke();
+ctx.setLineDash([]);
+
+// Ears (audio)
+ctx.fillStyle = "#2196f3";
+ctx.beginPath();
+ctx.arc(150, 150, 15, 0, 2 * Math.PI);
+ctx.fill();
+ctx.beginPath();
+ctx.arc(250, 150, 15, 0, 2 * Math.PI);
+ctx.fill();
+// Sound waves
+ctx.strokeStyle = "#2196f3";
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.arc(120, 120, 15, 0, 2 * Math.PI);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(120, 120, 25, 0, 2 * Math.PI);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(280, 120, 15, 0, 2 * Math.PI);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(280, 120, 25, 0, 2 * Math.PI);
+ctx.stroke();
+
+// Arms (tactile)
+ctx.fillStyle = "#4caf50";
+ctx.fillRect(120, 250, 20, 80);
+ctx.fillRect(260, 250, 20, 80);
+// Tactile indicators
+ctx.strokeStyle = "#4caf50";
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.arc(130, 245, 10, 0, 2 * Math.PI);
+ctx.stroke();
+ctx.beginPath();
+ctx.arc(270, 245, 10, 0, 2 * Math.PI);
+ctx.stroke();
+
+// Human silhouettes
+ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+ctx.beginPath();
+ctx.arc(100, 350, 30, 0, 2 * Math.PI);
+ctx.fill();
+ctx.fillRect(90, 380, 20, 40);
+ctx.beginPath();
+ctx.arc(300, 350, 30, 0, 2 * Math.PI);
+ctx.fill();
+ctx.fillRect(290, 380, 20, 40);
+
+// Text
+ctx.fillStyle = "#ffffff";
+ctx.font = "bold 20px Arial";
+ctx.textAlign = "center";
+ctx.fillText("Multi-Modal Perception", 200, 50);
+ctx.font = "16px Arial";
+ctx.fillText("Visual · Audio · Tactile", 200, 80);
+
+// Save canvas as PNG
+const imgData = canvas.toDataURL("image/png");
+document.write('<a href="' + imgData + '" download="multi-modal-perception.png">Download Multi-Modal Perception Image</a><br>');
+</script>
+</body>
+</html>

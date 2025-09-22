@@ -1,0 +1,41 @@
+---
+const currentYear = new Date().getFullYear();
+const { name = "Ben Zandonati" } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <p>&copy; {currentYear} {name}. All rights reserved.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  
+  .footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .footer-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  
+  @media (max-width: 768px) {
+    .site-footer {
+      padding: 1rem;
+    }
+    
+    .footer-content p {
+      font-size: 0.8rem;
+    }
+  }
+</style>

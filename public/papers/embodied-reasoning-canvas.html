@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="embodiedCanvas" width="400" height="400" style="border:1px solid #d3d3d3;"></canvas>
+<script>
+const canvas = document.getElementById("embodiedCanvas");
+const ctx = canvas.getContext("2d");
+
+// Background color
+ctx.fillStyle = "#3f51b5";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Draw robot and brain connection
+ctx.fillStyle = "#ffffff";
+// Robot body
+ctx.fillRect(50, 250, 100, 100);
+// Robot head
+ctx.beginPath();
+ctx.arc(100, 230, 30, 0, 2 * Math.PI);
+ctx.fill();
+// Robot eyes
+ctx.fillStyle = "#3f51b5";
+ctx.beginPath();
+ctx.arc(90, 225, 5, 0, 2 * Math.PI);
+ctx.fill();
+ctx.beginPath();
+ctx.arc(110, 225, 5, 0, 2 * Math.PI);
+ctx.fill();
+
+// Brain
+ctx.fillStyle = "#ffffff";
+ctx.beginPath();
+ctx.arc(300, 100, 60, 0, 2 * Math.PI);
+ctx.fill();
+ctx.strokeStyle = "#ffffff";
+ctx.lineWidth = 5;
+// Connection lines
+ctx.beginPath();
+ctx.moveTo(120, 220);
+ctx.bezierCurveTo(150, 180, 200, 150, 250, 120);
+ctx.stroke();
+
+// Brain details
+ctx.strokeStyle = "#3f51b5";
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(270, 80);
+ctx.bezierCurveTo(280, 70, 310, 90, 320, 80);
+ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(280, 110);
+ctx.bezierCurveTo(290, 100, 320, 120, 330, 110);
+ctx.stroke();
+ctx.beginPath();
+ctx.moveTo(270, 130);
+ctx.bezierCurveTo(280, 120, 310, 140, 320, 130);
+ctx.stroke();
+
+// Text
+ctx.fillStyle = "#ffffff";
+ctx.font = "bold 24px Arial";
+ctx.textAlign = "center";
+ctx.fillText("Embodied Reasoning", 200, 350);
+
+// Save canvas as PNG
+const imgData = canvas.toDataURL("image/png");
+document.write('<a href="' + imgData + '" download="embodied-reasoning.png">Download Embodied Reasoning Image</a><br>');
+</script>
+</body>
+</html>

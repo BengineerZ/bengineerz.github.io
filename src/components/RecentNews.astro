@@ -1,0 +1,278 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from './Icon.astro';
+
+// Get news entries and sort by date (descending)
+const allNews = await getCollection('news');
+const newsEntries = allNews.sort((a, b) => +b.data.date - +a.data.date);
+
+// Props
+const { showAll = false } = Astro.props;
+---
+
+<section class="recent-news">
+  <h2>Recent News</h2>
+  
+  {newsEntries.length > 0 ? (
+    <div class="news-container">
+      <ul class="news-list" id="news-list">
+        {newsEntries.map((entry, index) => (
+          <li class={`news-item ${index >= 2 ? 'hidden-news' : ''}`}>
+            <div class="news-content">
+              <div class="news-header">
+                <span class="news-date">
+                  ({entry.data.date.getFullYear()}-{String(entry.data.date.getMonth() + 1).padStart(2, '0')})
+                </span>
+                {entry.data.type && (
+                  <span class={`news-type ${entry.data.type}`}>
+                    {entry.data.type === 'presentation' && <Icon name="talk" size="0.8em" />}
+                    {entry.data.type === 'publication' && <Icon name="pencil" size="0.8em" />}
+                    {entry.data.type === 'award' && <Icon name="news" size="0.8em" />}
+                    {entry.data.type === 'general' && <Icon name="news" size="0.8em" />}
+                  </span>
+                )}
+              </div>
+              <div class="news-description">
+                {entry.data.link ? (
+                  <span set:html={entry.data.description.replace(
+                    new RegExp(`"([^"]*)"`, 'g'), 
+                    `<a href="${entry.data.link}" target="_blank" rel="noopener noreferrer" class="news-link">"$1"</a>`
+                  )} />
+                ) : (
+                  entry.data.description
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+      
+      {newsEntries.length > 2 && (
+        <button class="show-more-btn" id="show-more-btn">
+          <Icon name="news" size="0.9em" /> Show More News ({newsEntries.length - 2} more)
+        </button>
+        <button class="show-less-btn" id="show-less-btn" style="display: none;">
+          <Icon name="news" size="0.9em" /> Show Less News
+        </button>
+      )}
+    </div>
+  ) : (
+    <p>No news available yet.</p>
+  )}
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const showMoreBtn = document.getElementById('show-more-btn');
+    const showLessBtn = document.getElementById('show-less-btn');
+    const hiddenNews = document.querySelectorAll('.hidden-news');
+    
+    if (showMoreBtn) {
+      showMoreBtn.addEventListener('click', () => {
+        hiddenNews.forEach(item => {
+          item.classList.remove('hidden-news');
+          item.classList.add('show-news');
+        });
+        showMoreBtn.style.display = 'none';
+        if (showLessBtn) {
+          showLessBtn.style.display = 'inline-flex';
+        }
+      });
+    }
+    
+    if (showLessBtn) {
+      showLessBtn.addEventListener('click', () => {
+        hiddenNews.forEach(item => {
+          item.classList.add('hide-news');
+          setTimeout(() => {
+            item.classList.remove('show-news', 'hide-news');
+            item.classList.add('hidden-news');
+          }, 300); // Match animation duration
+        });
+        showLessBtn.style.display = 'none';
+        if (showMoreBtn) {
+          showMoreBtn.style.display = 'inline-flex';
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  .recent-news {
+    margin: 2rem 0;
+  }
+  
+  .news-container {
+    position: relative;
+  }
+  
+  .news-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .news-item {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border);
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+  }
+  
+  .news-item:last-child {
+    border-bottom: none;
+  }
+  
+  .news-item.hidden-news {
+    display: none;
+  }
+  
+  .news-item.show-news {
+    display: block;
+    animation: slideIn 0.3s ease forwards;
+  }
+  
+  .news-item.hide-news {
+    animation: slideOut 0.3s ease forwards;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+  
+  .news-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .news-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  
+  .news-date {
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    min-width: 80px;
+  }
+  
+  .news-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .news-type.presentation {
+    background: rgba(233, 113, 15, 0.1);
+    color: #e9710f;
+  }
+  
+  .news-type.publication {
+    background: rgba(0, 102, 204, 0.1);
+    color: #0066cc;
+  }
+  
+  .news-type.award {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+  }
+  
+  .news-type.general {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--text-muted);
+  }
+  
+  .news-description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  
+  .news-link {
+    color: var(--link);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .news-link:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+  }
+  
+  .show-more-btn, .show-less-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .show-more-btn:hover, .show-less-btn:hover {
+    background: rgba(128, 128, 128, 0.1);
+    border-color: var(--link);
+  }
+  
+  .show-more-btn:focus, .show-less-btn:focus {
+    outline: 2px solid var(--link);
+    outline-offset: 2px;
+  }
+  
+  section h2 {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    .news-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+    
+    .news-date {
+      min-width: auto;
+    }
+    
+    .news-description {
+      font-size: 0.9rem;
+    }
+  }
+</style>
