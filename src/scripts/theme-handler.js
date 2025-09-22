@@ -7,13 +7,14 @@ function setupThemeToggle() {
   const savedTheme = localStorage.getItem('theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   
-  // Set initial theme
+  // Set initial theme - default to light mode
   if (savedTheme === 'light') {
     document.documentElement.classList.add('light-theme');
   } else if (savedTheme === 'dark') {
     document.documentElement.classList.remove('light-theme');
-  } else if (prefersDark) {
-    document.documentElement.classList.remove('light-theme');
+  } else {
+    // Default to light mode when no preference is saved
+    document.documentElement.classList.add('light-theme');
   }
   
   // Update button state based on current theme
@@ -41,14 +42,14 @@ function setupThemeToggle() {
 // Apply theme from local storage without waiting for DOM content loaded
 function applyThemeImmediately() {
   const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   
   if (savedTheme === 'light') {
     document.documentElement.classList.add('light-theme');
   } else if (savedTheme === 'dark') {
     document.documentElement.classList.remove('light-theme');
-  } else if (prefersDark) {
-    document.documentElement.classList.remove('light-theme');
+  } else {
+    // Default to light mode when no preference is saved
+    document.documentElement.classList.add('light-theme');
   }
 }
 
