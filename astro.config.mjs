@@ -12,8 +12,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://[your-username].github.io',
-  base: '/[your-repo-name]',
+  site: 'https://bengineerz.github.io',
+  base: '/academic-website',
   output: 'static',
   integrations: [mdx({ remarkPlugins:[remarkMath], rehypePlugins:[rehypeKatex] }), react(), sitemap()],
   devToolbar: {
