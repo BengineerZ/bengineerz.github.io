@@ -31,12 +31,36 @@ const {
       <p class="profile-role">{role}</p>
     </div>
     
+    {/* Mobile icon links - shown inline with profile */}
+    <div class="mobile-links-wrapper">
+      {/* Priority 1: Google Scholar - always shown on mobile */}
+      {showScholar && (
+        <a href={scholarUrl} target="_blank" rel="noopener noreferrer" class="mobile-icon-link" title="Google Scholar">
+          <Icon name="googlescholar" size="1.2em" />
+        </a>
+      )}
+      
+      {/* Priority 2: LinkedIn - shown if space available */}
+      {linkedinUrl && (
+        <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" class="mobile-icon-link linkedin-icon" title="LinkedIn">
+          <Icon name="linkedin" size="1.2em" />
+        </a>
+      )}
+      
+      {/* Priority 3: GitHub - shown if more space available */}
+      {githubUrl && (
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer" class="mobile-icon-link github-icon" title="GitHub">
+          <Icon name="github" size="1.2em" />
+        </a>
+      )}
+    </div>
+    
     <ul class="profile-links">
-      {/* Google Scholar - visible on all screens */}
+      {/* Google Scholar - visible on desktop */}
       {showScholar && (
         <li class="link-item">
           <a href={scholarUrl} target="_blank" rel="noopener noreferrer" class="profile-link">
-            <Icon name="googlescholar" size="1.2em" /> Google Scholar
+            <Icon name="googlescholar" size="1.2em" /> <span class="link-text">Google Scholar</span>
           </a>
         </li>
       )}
@@ -45,7 +69,7 @@ const {
       {linkedinUrl && (
         <li class="link-item desktop-only">
           <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" class="profile-link">
-            <Icon name="linkedin" size="1.2em" /> LinkedIn
+            <Icon name="linkedin" size="1.2em" /> <span class="link-text">LinkedIn</span>
           </a>
         </li>
       )}
@@ -53,7 +77,7 @@ const {
       {githubUrl && (
         <li class="link-item desktop-only">
           <a href={githubUrl} target="_blank" rel="noopener noreferrer" class="profile-link">
-            <Icon name="github" size="1.2em" /> GitHub
+            <Icon name="github" size="1.2em" /> <span class="link-text">GitHub</span>
           </a>
         </li>
       )}
@@ -61,7 +85,7 @@ const {
       {location && (
         <li class="link-item desktop-only">
           <div class="profile-link location-link">
-            <Icon name="location" size="1.2em" /> {location}
+            <Icon name="location" size="1.2em" /> <span class="link-text">{location}</span>
           </div>
         </li>
       )}
@@ -193,56 +217,167 @@ const {
     color: var(--text-muted);
     cursor: default;
   }
+  
+  /* Hide mobile links wrapper on desktop */
+  .mobile-links-wrapper {
+    display: none;
+  }
 
   @media (max-width: 768px) {
     .profile-sidebar {
       position: relative;
       width: 100%;
-      padding: 1rem;
+      padding: 0.75rem 0.5rem;
       border-bottom: 1px solid var(--border);
     }
     
     .profile-container {
       flex-direction: row;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
-      gap: 1rem;
-      margin-bottom: 0.5rem;
+      gap: 0.75rem;
+      margin-bottom: 0.4rem;
+      width: 100%;
+      flex-wrap: nowrap;
     }
     
     .profile-image-container {
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       margin-bottom: 0;
       flex-shrink: 0;
     }
     
     .profile-text {
-      display: flex;
+      display: flex !important;
       flex-direction: column;
       align-items: flex-start;
       justify-content: center;
+      flex: 1 1 auto;
+      min-width: 0; /* Allow text to shrink */
+      visibility: visible;
+      opacity: 1;
     }
     
     .profile-name {
-      font-size: 1.2rem;
-      margin: 0 0 0.2rem;
+      display: block !important;
+      font-size: 1.1rem;
+      margin: 0 0 0.15rem;
       text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      color: var(--text);
+      visibility: visible;
+      opacity: 1;
     }
     
     .profile-role {
-      font-size: 0.9rem;
+      display: block !important;
+      font-size: 0.85rem;
       margin: 0;
       text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      color: var(--text-muted);
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Show mobile links wrapper inline with profile */
+    .mobile-links-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+      flex-shrink: 0;
+      padding-left: 0.5rem;
+    }
+    
+    .mobile-icon-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.3rem;
+      color: var(--link);
+      transition: color 0.2s;
+      border-radius: 4px;
+    }
+    
+    .mobile-icon-link:hover {
+      color: var(--link-hover);
+      background-color: rgba(128, 128, 128, 0.1);
     }
     
     .profile-links {
-      text-align: center;
-      margin-top: 0.5rem;
+      display: none; /* Hide all profile links on mobile */
     }
     
     .desktop-only {
       display: none; /* Hide desktop-only links on mobile */
+    }
+  }
+  
+  /* Medium mobile - hide GitHub, show Scholar + LinkedIn */
+  @media (max-width: 500px) {
+    .github-icon {
+      display: none;
+    }
+  }
+  
+  /* Small mobile - hide LinkedIn, show only Scholar */
+  @media (max-width: 420px) {
+    .linkedin-icon {
+      display: none;
+    }
+  }
+  
+  /* Extra small devices */
+  @media (max-width: 380px) {
+    .profile-sidebar {
+      padding: 0.5rem 0.25rem;
+    }
+    
+    .profile-container {
+      gap: 0.5rem;
+    }
+    
+    .profile-image-container {
+      width: 70px;
+      height: 70px;
+    }
+    
+    .profile-text {
+      display: flex !important;
+      visibility: visible;
+      opacity: 1;
+      min-width: 0;
+    }
+    
+    .profile-name {
+      display: block !important;
+      font-size: 1rem;
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .profile-role {
+      display: block !important;
+      font-size: 0.8rem;
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .mobile-links-wrapper {
+      padding-left: 0.3rem;
+      gap: 0.3rem;
+    }
+    
+    .mobile-icon-link {
+      padding: 0.2rem;
     }
   }
 </style>

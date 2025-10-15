@@ -14,16 +14,16 @@ import '../styles/theme.css';
     <link rel="apple-touch-icon" href="/favicon.ico" />
     <!-- Inline script to handle theme -->
     <script is:inline>
-      // Apply theme immediately
+      // Apply theme immediately - default to light mode
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       
       if (savedTheme === 'light') {
         document.documentElement.classList.add('light-theme');
       } else if (savedTheme === 'dark') {
         document.documentElement.classList.remove('light-theme');
-      } else if (prefersDark) {
-        document.documentElement.classList.remove('light-theme');
+      } else {
+        // Default to light mode when no preference is saved
+        document.documentElement.classList.add('light-theme');
       }
       
       // Setup theme toggle when DOM is loaded

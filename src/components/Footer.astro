@@ -31,7 +31,17 @@ const { name = "Ben Zandonati" } = Astro.props;
   
   @media (max-width: 768px) {
     .site-footer {
-      padding: 1rem;
+      padding: 1rem 0.5rem;
+    }
+    
+    .footer-content p {
+      font-size: 0.85rem;
+    }
+  }
+  
+  @media (max-width: 400px) {
+    .site-footer {
+      padding: 0.75rem 0.5rem;
     }
     
     .footer-content p {

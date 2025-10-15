@@ -99,7 +99,9 @@ const { showAll = false } = Astro.props;
                     {paper.data.title}
                   </a>
                 ) : (
-                  paper.data.title
+                  <a href={`/papers/#${paper.slug}`}>
+                    {paper.data.title}
+                  </a>
                 )}
               </h3>
               
@@ -180,22 +182,21 @@ const { showAll = false } = Astro.props;
   
 .publication-image {
     flex: 0 0 120px; /* Fixed width to ensure square aspect ratio */
+    width: 120px; /* Explicit width */
     height: 120px; /* Fixed height equal to width for perfect square */
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 8px; /* Rounded corners */
     background-color: var(--bg); /* Use theme background color */
     border: 1px solid var(--border); /* Add a subtle border */
     position: relative; /* For absolute positioning of children if needed */
+    flex-shrink: 0; /* Prevent shrinking */
 }
   
   .publication-image img {
     width: 100%;
     height: 100%;
     object-fit: cover; /* Makes sure image fills the square container */
-    border-radius: 8px; /* Rounded corners */
+    border-radius: 7px; /* Slightly smaller to account for container border */
     display: block; /* Ensures proper rendering */
   }
   
@@ -203,7 +204,7 @@ const { showAll = false } = Astro.props;
     width: 100%;
     height: 100%;
     object-fit: cover; /* Makes sure video fills the square container */
-    border-radius: 8px; /* Rounded corners */
+    border-radius: 7px; /* Slightly smaller to account for container border */
     display: block; /* Ensures proper rendering */
   }
   
@@ -340,6 +341,72 @@ const { showAll = false } = Astro.props;
     border-radius: 4px;
     white-space: nowrap;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Mobile responsive styles */
+  @media (max-width: 768px) {
+    .publication-container {
+      gap: 0.75rem;
+    }
+    
+    .publication-image {
+      flex: 0 0 100px; /* Smaller square on mobile */
+      width: 100px; /* Explicit width */
+      height: 100px;
+    }
+    
+    .publication-title {
+      font-size: 1rem;
+    }
+    
+    .publication-authors {
+      font-size: 0.85rem;
+    }
+    
+    .publication-meta {
+      font-size: 0.8rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .publication-container {
+      gap: 0.5rem;
+    }
+    
+    .publication-image {
+      flex: 0 0 80px; /* Even smaller square on very small devices */
+      width: 80px; /* Explicit width */
+      height: 80px;
+    }
+    
+    .publication-title {
+      font-size: 0.95rem;
+    }
+    
+    .publication-authors {
+      font-size: 0.8rem;
+    }
+    
+    .publication-meta {
+      font-size: 0.75rem;
+    }
+    
+    .publication-links {
+      gap: 0.75rem;
+      font-size: 0.8rem;
+    }
+  }
+  
+  @media (max-width: 380px) {
+    .publication-image {
+      flex: 0 0 70px; /* Minimal square on extra small devices */
+      width: 70px; /* Explicit width */
+      height: 70px;
+    }
+    
+    .publication-container {
+      gap: 0.4rem;
+    }
   }
 </style>
 

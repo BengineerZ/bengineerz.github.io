@@ -42,7 +42,7 @@ try {
   {papers.length > 0 ? (
     <ul class="papers-list">
       {papers.map(paper => (
-        <li class="paper-item">
+        <li class="paper-item" id={paper.slug}>
           <div class="paper-container">
             <div class="paper-image-container">
               {paper.data.image ? (
@@ -142,6 +142,11 @@ try {
 </AcademicBaseLayout>
 
 <style>
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Account for fixed header */
+  }
+  
   .papers-list {
     list-style: none;
     padding: 0;
@@ -150,10 +155,28 @@ try {
   .paper-item {
     border-bottom: 1px solid var(--border);
     padding: 1.8rem 0;
+    scroll-margin-top: 80px; /* Additional offset for anchored items */
   }
   
   .paper-item:last-child {
     border-bottom: none;
+  }
+  
+  /* Highlight effect for targeted paper */
+  .paper-item:target {
+    animation: highlight 2s ease-in-out;
+  }
+  
+  @keyframes highlight {
+    0% {
+      background-color: transparent;
+    }
+    10% {
+      background-color: rgba(var(--link-rgb, 153, 187, 221), 0.1);
+    }
+    100% {
+      background-color: transparent;
+    }
   }
   
   .paper-container {
@@ -181,15 +204,17 @@ try {
   .paper-image {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     background-color: #f8f9fa;
+    display: block;
   }
   
   .paper-image video {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     background-color: #f8f9fa;
+    display: block;
   }
   
   .paper-image-placeholder {
@@ -301,19 +326,101 @@ try {
   @media (max-width: 768px) {
     .paper-container {
       flex-direction: column;
-      gap: 1.2rem;
+      gap: 1rem;
+      align-items: center;
     }
     
     .paper-image-container {
-      width: 100%;
-      max-width: 250px;
-      height: 180px;
-      margin-bottom: 0.5rem;
+      width: 200px;
+      height: 200px;
+    }
+    
+    .paper-content {
+      text-align: center;
+      max-width: 100%;
+    }
+    
+    .paper-title {
+      font-size: 1.3rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .paper-authors {
+      font-size: 0.95rem;
+    }
+    
+    .paper-meta {
+      font-size: 0.85rem;
+    }
+    
+    .paper-tldr {
+      font-size: 0.9rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .paper-links {
       gap: 0.6rem;
       flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .paper-link {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .paper-image-container {
+      width: 180px;
+      height: 180px;
+    }
+    
+    .paper-item {
+      padding: 1.2rem 0;
+    }
+    
+    .paper-title {
+      font-size: 1.1rem;
+    }
+    
+    .paper-authors {
+      font-size: 0.9rem;
+    }
+    
+    .paper-meta {
+      font-size: 0.8rem;
+    }
+    
+    .paper-tldr {
+      font-size: 0.85rem;
+    }
+    
+    .paper-links {
+      gap: 0.5rem;
+    }
+    
+    .paper-link {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+    }
+  }
+  
+  @media (max-width: 380px) {
+    .paper-image-container {
+      width: 160px;
+      height: 160px;
+    }
+  }
+  
+  @media (max-width: 320px) {
+    .paper-image-container {
+      width: 140px;
+      height: 140px;
     }
   }
   
@@ -485,6 +592,18 @@ try {
           }
         }
       });
+    }
+    
+    // Handle smooth scrolling to anchor on page load
+    if (window.location.hash) {
+      // Wait a bit for the page to fully load and render
+      setTimeout(() => {
+        const targetId = window.location.hash.substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     }
   });
 </script>
